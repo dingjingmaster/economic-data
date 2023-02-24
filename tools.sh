@@ -2,12 +2,14 @@
 
 # shellcheck disable=SC2046
 workDir=$(realpath -- $(dirname "$0"))
+dataDir="${workDir}/data/"
 
 # 全局变量
 fundListPython="${workDir}/bin/get-all-fund.py"
 fundInfoPython="${workDir}/bin/fund-name-by-code.py"
+fundWorthPython="${workDir}/bin/fund-net-worth.py"
 
-fundListFile="${workDir}/data/fund-list.csv"
+fundListFile="${dataDir}/fund-list.csv"
 
 
 # 全局变量结束
@@ -142,9 +144,10 @@ function usage()
 使用: ${0##*/} [配置选项]
 
   配置选项:
-   -u, --update                   更新本地基金列表
-   -n, --name <fund name>         根据基金名字获取基金ID
-   -h, --help                     显示此帮助信息并退出
+   -u, --update                     更新本地基金列表
+   -n, --name <fund name>           根据基金名字获取基金ID
+   -w, --net-worth <fund code>      根据基金ID获取净值
+   -h, --help                       显示此帮助信息并退出
 
 EOF
 }
@@ -161,6 +164,11 @@ function fund_name_by_code()
 
 }
 
+function fund_worth_by_code()
+{
+    python "${fundWorthPython}" "$1" "${dataDir}"
+}
+
 ### main
 trap 'cleanup 130' INT
 trap 'cleanup 143' TERM
@@ -170,8 +178,8 @@ if [ "$#" -lt 1 ]; then
     cleanup 1
 fi
 
-_opt_short='n:hu'
-_opt_long=('name:' 'help' 'update')
+_opt_short='n:w:hu'
+_opt_long=('name:' 'help' 'update' 'net-worth')
 
 parseopts "$_opt_short" "${_opt_long[@]}" -- "$@" || exit 1
 set -- "${OPTRET[@]}"
@@ -186,6 +194,10 @@ while :; do
         -n|--name)
             shift
             fund_name_by_code "$1"
+            ;;
+        -w|--net-worth)
+            shift
+            fund_worth_by_code "$1"
             ;;
         -h|--help)
             usage
