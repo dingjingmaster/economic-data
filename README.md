@@ -1,10 +1,16 @@
 # 数据预测
 
+## 模型名字
+
+- prophet
+
 ## 环境准备
 
 ### python
 
 - requests
+
+- prettytable
 
 - matplotlib
     ```shell
