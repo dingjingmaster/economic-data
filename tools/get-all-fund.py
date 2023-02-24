@@ -6,6 +6,8 @@ import sys
 import requests
 import pandas as pd
 
+from functions import *
+
 
 fundInfo = {}
 URL = 'http://fund.eastmoney.com/js/fundcode_search.js'
@@ -22,19 +24,6 @@ def save_fund_data(new: dict, path: str):
     df = pd.DataFrame({'基金代码': code, '基金名称': name, '基金类别': category})
     df.to_csv(path, index=False, sep='|')
     return
-
-
-def read_fun_data(path: str):
-    f = {}
-    if os.path.exists(path):
-        try:
-            old = pd.read_csv(path, sep='|').values.tolist()
-            for line in old:
-                f[line[0]] = (line[1], line[2])
-            return f
-        except:
-            return None
-    return None
 
 
 def union_fun_data(old: dict, new: dict):
