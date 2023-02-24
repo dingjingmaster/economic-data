@@ -14,3 +14,13 @@ def read_fun_data(path: str):
             print(e)
             return None
     return None
+
+
+def read_fun_data_as_df(path: str):
+    if os.path.exists(path):
+        try:
+            return pd.read_csv(path, sep='|')
+        except Exception as e:
+            print(e)
+            return None
+    return None
