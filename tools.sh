@@ -3,6 +3,13 @@
 # shellcheck disable=SC2046
 workDir=$(realpath -- $(dirname "$0"))
 dataDir="${workDir}/data/"
+pythoncmd="python3"
+
+[ -x "/usr/bin/python" ] && pythoncmd="python"
+[ -x "/usr/bin/python3" ] && pythoncmd="python3"
+
+echo "${pythoncmd}"
+
 
 # 全局变量
 fundListPython="${workDir}/bin/get-all-fund.py"
@@ -155,18 +162,18 @@ EOF
 
 function update_fund_list()
 {
-    python "${fundListPython}" "${fundListFile}"
+    ${pythoncmd} "${fundListPython}" "${fundListFile}"
 }
 
 function fund_name_by_code()
 {
-    python "${fundInfoPython}" "$1" "${fundListFile}"
+    ${pythoncmd} "${fundInfoPython}" "$1" "${fundListFile}"
 
 }
 
 function fund_worth_by_code()
 {
-    python "${fundWorthPython}" "$1" "${dataDir}"
+    ${pythoncmd} "${fundWorthPython}" "$1" "${dataDir}"
 }
 
 ### main

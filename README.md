@@ -8,9 +8,14 @@
 
 ### python
 
+- bs4
+    pip3 install bs4 -i https://pypi.tuna.tsinghua.edu.cn/simple
+
 - requests
+    pip3 install requests -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 - prettytable
+    pip3 install prettytable -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 - matplotlib
     ```shell
