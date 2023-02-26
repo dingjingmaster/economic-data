@@ -20,11 +20,13 @@ if __name__ == '__main__':
 
     # 从此处挑选中文字体
     # for font in matplotlib.font_manager.fontManager.ttflist:
-    #     print(font.name)
-
-    plt.rcParams['font.family'] = 'sans-serif'
-    plt.rcParams["font.sans-serif"] = ['Source Han Mono SC']
+    #    print(font.name)
     plt.rcParams["axes.unicode_minus"] = False
+    plt.rcParams['font.family'] = 'sans-serif'
+    if system_is_linux():
+        plt.rcParams["font.sans-serif"] = ['Source Han Mono SC']
+    elif system_is_mac():
+        plt.rcParams["font.sans-serif"] = ['Songti SC']
 
     print(category)
     plt.style.use('ggplot')

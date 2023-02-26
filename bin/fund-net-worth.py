@@ -2,23 +2,37 @@
 # -*- coding=utf-8 -*-
 import sys
 
+import matplotlib
 import matplotlib.pyplot as plt
 
 from functions import *
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
+    if len(sys.argv) < 3:
         exit(-1)
 
     fundCode = sys.argv[1]
     saveDir = sys.argv[2]
     startDate = '2002-01-01'
+    days = -1
+    if len(sys.argv) >= 4:
+        try:
+            days = int(sys.argv[3])
+            startDate = get_start_date(days)
+        except Exception as e:
+            days = -1
+
     endDate = time.strftime('%Y-%m-%d', time.localtime())
 
     savePath = "{dataDir}/{fundCode}.csv".format(dataDir=saveDir, fundCode=fundCode)
 
-    data = get_fund_data(fundCode, per=49, startDate=startDate, endDate=endDate)
+    data = get_fund_data(fundCode, per=46, startDate=startDate, endDate=endDate)
+    if -1 == days:
+        oldData = read_fun_data_as_df(savePath)
+        if None is not oldData:
+            data = pd.concat([data, oldData])
+            data.drop_duplicates(subset='净值日期', keep='first', inplace=True, ignore_index=True)
     data.to_csv(savePath, index=False, sep='|')
 
     rateBase = 0    # 增长率基准
@@ -27,8 +41,8 @@ if __name__ == '__main__':
     data['净值日期'] = pd.to_datetime(data['净值日期'], format='%Y-%m-%d')
     data['单位净值'] = data['单位净值'].astype(float)
     data['累计净值'] = data['累计净值'].astype(float)
-    data['日增净值'] = data['日增净值'].str.strip('%').astype(float)
-    data['基净值'] = rateBase
+    data['日增长率'] = data['日增长率'].str.strip('%').astype(float)
+    data['基准值'] = rateBase
 
     # 按照日期升序排序并重建索引
     data = data.sort_values(by='净值日期', axis=0, ascending=True).reset_index(drop=True)
@@ -39,9 +53,35 @@ if __name__ == '__main__':
     vDailyRate = data['日增长率']
     vDailyBase = data['基准值']
 
-    # 做图
-    fig = plt.figure(figsize=(16, 10), dpi=240)
+    # 从此处挑选中文字体
+    # for font in matplotlib.font_manager.fontManager.ttflist:
+    #    print(font.name)
+    plt.rcParams["axes.unicode_minus"] = False
+    plt.rcParams['font.family'] = 'sans-serif'
+    if system_is_linux():
+        plt.rcParams["font.sans-serif"] = ['Source Han Mono SC']
+    elif system_is_mac():
+        plt.rcParams["font.sans-serif"] = ['Songti SC']
 
+    # 做图
+    fig = plt.figure(figsize=(16, 10))
+
+    #
     ax1 = fig.add_subplot(211)
+    ax1.plot(vDate, vAsset, label='基金净值')
+    ax1.plot(vDate, vAN, label='累计净值')
+    ax1.set_ylabel('净值数据')
+    ax1.set_xlabel('日期')
+    plt.legend(loc='upper left')
+
+    #
+    ax2 = fig.add_subplot(212)
+    ax2.plot(vDate, vDailyRate, 'r', label='日增长率')
+    ax2.plot(vDate, vDailyBase, 'b', label='增长率基准值')
+    ax2.set_ylabel('日增长率(%)')
+    plt.legend(loc='upper right')
+    plt.title('基金净值数据')
+
+    plt.show()
 
     exit(0)

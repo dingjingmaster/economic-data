@@ -3,14 +3,31 @@ import re
 import time
 
 import difflib
+import datetime
+import platform
 import requests
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
 
 
+def system_is_mac() ->bool:
+    return platform.system().lower() == 'darwin'
+
+
+def system_is_linux() ->bool:
+    return platform.system().lower() == 'linux'
+
+
 def string_similar(s1: str, s2: str) ->float:
     return difflib.SequenceMatcher(None, s1, s2).quick_ratio()
+
+
+def get_start_date(days: int) ->str:
+    # 返回字符串 %Y-%m-%d
+    eTime = datetime.datetime.now()
+    sTime = eTime - datetime.timedelta(days)
+    return sTime.strftime('%Y-%m-%d')
 
 
 def read_fun_data(path: str):
@@ -52,7 +69,7 @@ def get_fund_data(code: str, per=10, startDate='', endDate='', proxies=None):
         'edate': endDate
     }
     html = get_url(url, params, proxies)
-    soup = BeautifulSoup (html, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser')
 
     # 总页数
     pattern = re.compile(r'pages:(.*),')
@@ -96,5 +113,5 @@ def get_fund_data(code: str, per=10, startDate='', endDate='', proxies=None):
     data = pd.DataFrame()
     for c, cName in enumerate(heads):
         data[cName] = df[:, c]
-    print(data)
+    # print(data)
     return data

@@ -8,7 +8,7 @@ pythoncmd="python3"
 [ -x "/usr/bin/python" ] && pythoncmd="python"
 [ -x "/usr/bin/python3" ] && pythoncmd="python3"
 
-echo "${pythoncmd}"
+#echo "${pythoncmd}"
 
 
 # 全局变量
@@ -151,10 +151,11 @@ function usage()
 使用: ${0##*/} [配置选项]
 
   配置选项:
-   -u, --update                     更新本地基金列表
-   -n, --name <fund name>           根据基金名字获取基金ID
-   -w, --net-worth <fund code>      根据基金ID获取净值
-   -h, --help                       显示此帮助信息并退出
+   -u,  --update                     更新本地基金列表
+   -n,  --name <fund name>           根据基金名字获取基金ID
+   -w,  --net-worth <fund code>      根据基金ID获取净值
+   -W,  --net-worth-days <fund code> 根据基金ID获取净值，可以添加'时间范围(例如: 10d)'参数
+   -h,  --help                       显示此帮助信息并退出
 
 EOF
 }
@@ -168,12 +169,18 @@ function update_fund_list()
 function fund_name_by_code()
 {
     ${pythoncmd} "${fundInfoPython}" "$1" "${fundListFile}"
-
 }
 
 function fund_worth_by_code()
 {
-    ${pythoncmd} "${fundWorthPython}" "$1" "${dataDir}"
+    [[ x"$2" == x'' ]] && ${pythoncmd} "${fundWorthPython}" "$1" "${dataDir}"
+    [[ x"$2" != x'' ]] && ${pythoncmd} "${fundWorthPython}" "$1" "${dataDir}" "$2"
+}
+
+function fund()
+{
+  exit 0
+
 }
 
 ### main
@@ -185,8 +192,8 @@ if [ "$#" -lt 1 ]; then
     cleanup 1
 fi
 
-_opt_short='n:w:hu'
-_opt_long=('name:' 'help' 'update' 'net-worth')
+_opt_short='n:w:W:hu'
+_opt_long=('name:' 'net-worth:' 'net-worth-days:' 'help' 'update')
 
 parseopts "$_opt_short" "${_opt_long[@]}" -- "$@" || exit 1
 set -- "${OPTRET[@]}"
@@ -205,6 +212,14 @@ while :; do
         -w|--net-worth)
             shift
             fund_worth_by_code "$1"
+            ;;
+        -W|--net-worth-days)
+            shift
+            fundCode=$1
+            shift
+            days="$2"
+            days=${days%*d}
+            fund_worth_by_code "${fundCode}" "${days}"
             ;;
         -h|--help)
             usage

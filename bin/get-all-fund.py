@@ -60,12 +60,12 @@ if __name__ == '__main__':
         if '' == c[0] or '' == c[2] or '' == c[3]:
             continue
         fundInfo['J' + c[0].strip()] = (c[2].strip(), c[3].strip())
-    print("新获取基金数: {size}".format(size=len(fundInfo)))
 
     fundOldInfo = read_fun_data(fundSavePath)
     if None is not fundOldInfo:
-        print("历史基金数: {size}".format(size=len(fundOldInfo)))
+        print("历史基金数  : {size}".format(size=len(fundOldInfo)))
         fundInfo = union_fun_data(fundOldInfo, fundInfo)
+    print("新获取基金数: {size}".format(size=len(fundInfo)))
     save_fund_data(fundInfo, fundSavePath)
 
     exit(0)
